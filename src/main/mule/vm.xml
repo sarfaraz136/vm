@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="f6421d72-bf22-471d-9c9b-867dc89af519" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<vm:config name="VM_Config1" doc:name="VM Config" doc:id="ffaa7b5f-55e1-4aa5-afa2-34f963c77101" >
+		<vm:queues >
+			<vm:queue queueName="VM_Publish" />
+		</vm:queues>
+	</vm:config>
+	<flow name="vmFlow" doc:id="6fab64b4-9849-44d1-b220-72ec571e9fd0" >
+		<http:listener doc:name="Listener" doc:id="180882c6-5a59-488e-baf5-2cdb175ea62e" config-ref="HTTP_Listener_config" path="/Virtual Machine"/>
+		<set-variable value='#["Innova"]' doc:name="Set Variable" doc:id="dc301dbc-d84b-4598-a53d-5f7b19f17fab" variableName="Cars"/>
+		<logger level="INFO" doc:name="Logger" doc:id="d253c4be-3a16-4e03-b746-60c760647e94" message="#[vars.Cars]"/>
+		<set-payload value='#["Doors"]' doc:name="Set Payload" doc:id="08ecffc4-034a-4cc7-91e7-76ff3b078f2d" />
+		<logger level="INFO" doc:name="Logger" doc:id="abe26100-5b71-49c8-89a1-43892885d980" message="#[payload]"/>
+		<flow-ref doc:name="Flow Reference" doc:id="c1946268-d192-4692-8626-349c58bbab2a" name="vmSub_Flow"/>
+		<flow-ref doc:name="Flow Reference" doc:id="1511dfee-b067-4ffb-b4c1-aea7659af647" name="vmFlow1"/>
+		<vm:publish doc:name="Publish" doc:id="77391d8c-9c97-4e87-9514-9ba6a0926d13" config-ref="VM_Config1" queueName="VM_Publish"/>
+	</flow>
+	<sub-flow name="vmSub_Flow" doc:id="a447db58-ae19-4616-aee7-6f406deb565f" >
+		<set-payload value='#["Windows"]' doc:name="Set Payload" doc:id="ff65c858-0ffd-4147-bbea-05aff5541a20" />
+		<logger level="INFO" doc:name="Logger" doc:id="a741e2eb-beec-46a6-b603-cfaebe6518e2" message="#[payload]"/>
+	</sub-flow>
+	<flow name="vmFlow1" doc:id="83d4e359-b5d6-4ef7-8385-fd1a86020dda" >
+		<vm:listener doc:name="Listener" doc:id="c449c920-0bcc-4db1-8c45-3f6cd94dc938" config-ref="VM_Config1" queueName="VM_Listener"/>
+		<set-payload value='#["Walls"]' doc:name="Set Payload" doc:id="5aa753d8-aac6-42ca-8468-2b3e98c5a2ec" />
+		<logger level="INFO" doc:name="Logger" doc:id="a2762ece-13aa-4df7-be60-e498f2b10840" message="#[payload]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="372060fd-33c0-4805-8d33-dc4e89dae69f" message='#[vars.cars]'/>
+	</flow>
+</mule>
